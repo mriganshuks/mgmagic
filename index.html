@@ -19,6 +19,10 @@
             --glass-border: rgba(255, 255, 255, 0.15);
             --glass-blur: blur(16px);
             --accent: #00ffcc;
+            --spacing-sm: 0.75rem;
+            --spacing-md: 1.25rem;
+            --font-size-sm: 0.85rem;
+            --font-size-base: 1rem;
         }
 
         * {
@@ -27,17 +31,27 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             overflow: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
         }
 
         .video-container {
             position: absolute;
-            width: 100vw;
-            height: 100vh;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
 
         .input_video {
@@ -47,22 +61,18 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transform: scaleX(-1); /* Mirror */
-            z-index: 0; /* Let the raw camera sit behind */
-            filter: brightness(0.6) contrast(1.1); /* Subtle dark to make neon pop */
+            transform: scaleX(-1);
+            z-index: 0;
+            filter: brightness(0.6) contrast(1.1);
         }
 
-        /* 
-         * Background Canvas captures the video frame and applies the matrix rain/starfield 
-         */
         #bgCanvas, #mainCanvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1); /* Mirror */
+            transform: scaleX(-1);
         }
         
         #bgCanvas {
@@ -73,18 +83,17 @@
         #mainCanvas {
             z-index: 5;
             pointer-events: none;
-            /* We use mix-blend-mode for the glowing effects in canvas */
         }
 
         /* UI Overlays */
         #hud {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: var(--spacing-md);
+            left: var(--spacing-md);
             z-index: 10;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 1rem;
             pointer-events: none;
         }
 
@@ -93,18 +102,18 @@
             backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
             border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 15px 20px;
+            border-radius: 8px;
+            padding: var(--spacing-md) var(--spacing-md);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         }
 
         .stat {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-size: var(--font-size-sm);
             color: rgba(255, 255, 255, 0.8);
-            min-width: 180px;
+            min-width: 150px;
         }
         .stat:last-child { margin-bottom: 0; }
         .stat span.val { font-weight: bold; color: var(--accent); }
@@ -112,29 +121,33 @@
         /* Themes */
         #themes {
             position: absolute;
-            bottom: 20px;
+            bottom: var(--spacing-md);
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
             display: flex;
-            gap: 10px;
+            gap: 0.5rem;
             background: var(--glass-bg);
             backdrop-filter: var(--glass-blur);
             border: 1px solid var(--glass-border);
             border-radius: 30px;
-            padding: 8px;
+            padding: 0.5rem;
             transition: opacity 0.5s;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .theme-btn {
             background: transparent;
             border: 1px solid transparent;
             color: white;
-            padding: 8px 16px;
+            padding: 0.5rem 1rem;
             border-radius: 20px;
             cursor: pointer;
             transition: 0.3s ease;
             font-weight: 500;
+            font-size: var(--font-size-sm);
+            white-space: nowrap;
         }
         
         .theme-btn.active {
@@ -155,11 +168,27 @@
             align-items: center;
             backdrop-filter: blur(10px);
             transition: opacity 0.5s ease;
+            padding: var(--spacing-md);
+        }
+
+        #startOverlay h1 {
+            margin-bottom: 1rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-align: center;
+            font-size: clamp(1.5rem, 5vw, 3rem);
+        }
+
+        #startOverlay p {
+            margin-bottom: 2rem;
+            color: #888;
+            text-align: center;
+            font-size: clamp(0.85rem, 3vw, 1rem);
         }
 
         .start-btn {
-            padding: 16px 40px;
-            font-size: 1.2rem;
+            padding: clamp(0.75rem, 2vw, 1rem) clamp(2rem, 5vw, 2.5rem);
+            font-size: clamp(1rem, 2vw, 1.2rem);
             background: linear-gradient(45deg, #ff00cc, #3333ff);
             border: none;
             color: white;
@@ -168,12 +197,123 @@
             box-shadow: 0 0 20px rgba(255, 0, 204, 0.5);
             font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             transition: transform 0.2s;
+            touch-action: manipulation;
         }
         .start-btn:hover { transform: scale(1.05); }
+        .start-btn:active { transform: scale(0.98); }
 
         .hidden { opacity: 0; pointer-events: none; }
+
+        /* Responsive Design Breakpoints */
+        @media (max-width: 768px) {
+            :root {
+                --spacing-md: 1rem;
+                --font-size-sm: 0.75rem;
+            }
+
+            .panel {
+                padding: 1rem 0.75rem;
+                border-radius: 6px;
+            }
+
+            .stat {
+                font-size: 0.75rem;
+                min-width: 130px;
+            }
+
+            .theme-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.7rem;
+            }
+
+            #hud {
+                top: 0.75rem;
+                left: 0.75rem;
+                gap: 0.75rem;
+            }
+
+            #themes {
+                bottom: 0.75rem;
+                padding: 0.4rem;
+                gap: 0.25rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            :root {
+                --spacing-md: 0.75rem;
+                --font-size-sm: 0.65rem;
+            }
+
+            .panel {
+                padding: 0.75rem 0.6rem;
+                min-width: 100px;
+            }
+
+            .stat {
+                font-size: 0.65rem;
+                min-width: 90px;
+            }
+
+            .theme-btn {
+                padding: 0.35rem 0.7rem;
+                font-size: 0.6rem;
+            }
+
+            #hud {
+                top: 0.5rem;
+                left: 0.5rem;
+                gap: 0.5rem;
+            }
+
+            #themes {
+                bottom: 0.5rem;
+                width: calc(100% - 1rem);
+                padding: 0.35rem;
+                gap: 0.2rem;
+            }
+
+            #startOverlay h1 {
+                margin-bottom: 0.75rem;
+                letter-spacing: 1px;
+            }
+
+            #startOverlay p {
+                margin-bottom: 1.5rem;
+            }
+
+            .start-btn {
+                font-size: 1rem;
+            }
+        }
+
+        /* Landscape mode optimization */
+        @media (max-height: 500px) {
+            #startOverlay h1 {
+                font-size: clamp(1.2rem, 3vw, 2rem);
+                margin-bottom: 0.5rem;
+            }
+
+            #startOverlay p {
+                margin-bottom: 1rem;
+                font-size: clamp(0.75rem, 2vw, 0.85rem);
+            }
+
+            .start-btn {
+                padding: 0.6rem 2rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* High density displays */
+        @media (min-resolution: 2dppx) {
+            body {
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+        }
     </style>
 </head>
 <body>
@@ -181,7 +321,7 @@
     <!-- Start Overlay (Required for AudioContext initialization) -->
     <div id="startOverlay">
         <h1 style="margin-bottom: 20px; font-weight: 300; letter-spacing: 4px;">MG AURA MAGIC
-            
+
         </h1>
         <p style="margin-bottom: 40px; color: #888;">Grant camera permissions and click to start audio/visual experience</p>
         <button class="start-btn" id="startBtn">Enter Experience</button>
@@ -217,11 +357,35 @@
 /** 
  * GLOBALS & CONFIG
  */
+// Detect device capabilities
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+const isTablet = /iPad|Android/.test(navigator.userAgent);
+const isLowEndDevice = isMobile && (navigator.deviceMemory < 4 || navigator.hardwareConcurrency < 4);
+
+// Performance configuration based on device
+const CONFIG = {
+    isMobile,
+    isTablet,
+    isLowEnd: isLowEndDevice,
+    maxParticles: isLowEndDevice ? 15 : isMobile ? 30 : 50,
+    maxRipples: isLowEndDevice ? 2 : isMobile ? 4 : 8,
+    shadowBlur: isLowEndDevice ? 5 : isMobile ? 8 : 15,
+    particleChance: isLowEndDevice ? 0.4 : isMobile ? 0.5 : 0.6,
+    matrixDensity: isLowEndDevice ? 0.92 : isMobile ? 0.93 : 0.95,
+    targetFPS: isLowEndDevice ? 30 : isMobile ? 60 : 60,
+    cameraWidth: isLowEndDevice ? 640 : isMobile ? 960 : 1280,
+    cameraHeight: isLowEndDevice ? 480 : isMobile ? 720 : 720,
+    modelComplexity: isLowEndDevice ? 0 : 1,
+    enableGradientLines: !isLowEndDevice,
+    enableLightning: !isLowEndDevice,
+    maxShadowBlur: isLowEndDevice ? 0 : isMobile ? 5 : 10
+};
+
 const videoElement = document.querySelector('.input_video');
 const bgCanvas = document.getElementById('bgCanvas');
 const mainCanvas = document.getElementById('mainCanvas');
-const bgCtx = bgCanvas.getContext('2d');
-const ctx = mainCanvas.getContext('2d');
+const bgCtx = bgCanvas.getContext('2d', { alpha: true, willReadFrequently: false });
+const ctx = mainCanvas.getContext('2d', { alpha: true, willReadFrequently: false });
 
 let width = window.innerWidth;
 let height = window.innerHeight;
@@ -230,9 +394,11 @@ let time = 0;
 let lastTime = performance.now();
 let framesThisSecond = 0;
 let lastFpsTime = performance.now();
+let lastFrameTime = 0;
+let frameInterval = 1000 / CONFIG.targetFPS;
 
-let currentHands = []; // Latest data from MediaPipe
-let handVelocities = 0; // Average hand movement speed
+let currentHands = [];
+let handVelocities = 0;
 
 // Theme Config
 let currentTheme = 'Rainbow';
@@ -251,7 +417,7 @@ const FINGER_TIPS = [4, 8, 12, 16, 20];
 
 // Matrix Background
 let matrixColumns = [];
-const fontSize = 16;
+const fontSize = isMobile ? 12 : 16;
 let maxColumns = 0;
 
 // Audio Node References
@@ -277,9 +443,10 @@ function resize() {
     mainCanvas.height = height;
     
     maxColumns = Math.floor(width / fontSize);
-    matrixColumns = new Array(maxColumns).fill(1).map(() => Math.random() * height/fontSize);
+    matrixColumns = new Array(maxColumns).fill(1).map(() => Math.random() * height / fontSize);
 }
-window.addEventListener('resize', resize);
+
+window.addEventListener('resize', resize, { passive: true });
 resize();
 
 // UI Theme Switcher
@@ -289,7 +456,7 @@ document.querySelectorAll('.theme-btn').forEach(btn => {
         e.target.classList.add('active');
         currentTheme = e.target.getAttribute('data-theme');
         document.documentElement.style.setProperty('--accent', themes[currentTheme](0, 1, 1));
-    });
+    }, { passive: true });
 });
 
 // Start button triggers AudioContext and hides overlay
@@ -300,7 +467,7 @@ document.getElementById('startBtn').addEventListener('click', () => {
     initAudio();
     initMediaPipe();
     requestAnimationFrame(renderLoop);
-});
+}, { passive: true });
 
 
 /**
@@ -317,7 +484,7 @@ function initAudio() {
         humOsc.type = 'sine';
         humOsc.frequency.value = 100;
         
-        humGain.gain.value = 0; // Mute until hands are seen
+        humGain.gain.value = 0;
         
         humOsc.connect(humGain);
         humGain.connect(audioCtx.destination);
@@ -329,22 +496,25 @@ function initAudio() {
 
 function triggerZap() {
     if (!audioCtx) return;
-    const osc = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    
-    // Zap sound profile
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.1);
-    
-    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-    
-    osc.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.15);
+    try {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.1);
+        
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+        
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+    } catch(e) {
+        console.error("Zap sound failed", e);
+    }
 }
 
 function updateHum(activeHands) {
@@ -354,16 +524,14 @@ function updateHum(activeHands) {
         return;
     }
 
-    // Measure distance between index fingers to modulate volume
     const p1 = activeHands[0][8];
     const p2 = activeHands[1][8];
     const dx = p1.x - p2.x;
     const dy = p1.y - p2.y;
     const dist = Math.sqrt(dx*dx + dy*dy);
     
-    // The closer they are, the higher the pitch and volume
     const targetFreq = 100 + (1 - Math.min(dist, 1)) * 300;
-    const targetVolume = 0.05 + (1 - Math.min(dist, 1)) * 0.15;
+    const targetVolume = 0.03 + (1 - Math.min(dist, 1)) * 0.1;
     
     humOsc.frequency.setTargetAtTime(targetFreq, audioCtx.currentTime, 0.1);
     humGain.gain.setTargetAtTime(targetVolume, audioCtx.currentTime, 0.1);
@@ -376,23 +544,21 @@ function getDist(p1, p2) {
     return Math.hypot(p1.x - p2.x, p1.y - p2.y);
 }
 
-// Convert normalized landmark to specific canvas scale (Note: canvas is horizontally flipped)
 function mapToCanvas(point) {
     return { x: point.x * width, y: point.y * height };
 }
 
-let lastPinchState = [false, false]; // Prevents rapid re-triggering
+let lastPinchState = [false, false];
 
 function detectGestures() {
     if (!currentHands.length) return;
     
     currentHands.forEach((hand, idx) => {
-        // Pinch Detection: Thumb (4) and Index (8)
         const thumb = hand[4];
         const index = hand[8];
         const dist = getDist(thumb, index);
         
-        const isPinching = dist < 0.05; // 5% of screen screen distance
+        const isPinching = dist < 0.05;
         
         if (isPinching && !lastPinchState[idx]) {
             const midpoint = {
@@ -406,10 +572,8 @@ function detectGestures() {
         lastPinchState[idx] = isPinching;
     });
 
-    // Spread Percentage roughly estimated by distance from Palm(0) to Index(8) and Pinky(20)
     if (currentHands[0]) {
         const spread = getDist(currentHands[0][8], currentHands[0][20]);
-        // Normalizing spread so max is around 100%
         let spreadPct = Math.min(Math.round(spread * 300), 100);
         uiSpread.innerText = spreadPct + '%';
         if (!lastPinchState.includes(true)) {
@@ -421,26 +585,30 @@ function detectGestures() {
 /**
  * EFFECTS & PHYSICS
  */
-function createParticles(pos, color, count = 3) {
-    for (let i=0; i<count; i++) {
+function createParticles(pos, color, count = 1) {
+    if (particles.length >= CONFIG.maxParticles) return;
+    
+    for (let i = 0; i < count; i++) {
+        if (particles.length >= CONFIG.maxParticles) break;
         particles.push({
             x: pos.x,
             y: pos.y,
-            vx: (Math.random() - 0.5) * 8,
-            vy: (Math.random() - 0.5) * 8,
+            vx: (Math.random() - 0.5) * 6,
+            vy: (Math.random() - 0.5) * 6,
             life: 1.0,
             color: color,
-            size: Math.random() * 3 + 1
+            size: Math.random() * 2 + 0.5
         });
     }
 }
 
 function createShockwave(pos, color) {
+    if (ripples.length >= CONFIG.maxRipples) return;
     ripples.push({
         x: pos.x,
         y: pos.y,
         radius: 0,
-        maxRadius: 150 + Math.random() * 100,
+        maxRadius: 100 + Math.random() * 50,
         life: 1.0,
         color: color
     });
@@ -448,29 +616,25 @@ function createShockwave(pos, color) {
 
 // Background Effect Engine
 function drawBackground() {
-    // Use destination-out to fade out the previous frame's drops, leaving a transparent trail
     bgCtx.globalCompositeOperation = 'destination-out';
-    bgCtx.fillStyle = `rgba(0, 0, 0, ${0.15 + Math.min(handVelocities*10, 0.5)})`;
+    bgCtx.fillStyle = `rgba(0, 0, 0, ${0.12 + Math.min(handVelocities * 8, 0.4)})`;
     bgCtx.fillRect(0, 0, width, height);
     bgCtx.globalCompositeOperation = 'source-over';
 
-    // Matrix Rain Effect mapping to hand speed
     bgCtx.fillStyle = themes[currentTheme](time, 1, 1);
     bgCtx.font = fontSize + "px monospace";
     
-    // Matrix speed boosts when hands move fast
-    let speedMult = 1 + (handVelocities * 100);
+    let speedMult = 1 + (handVelocities * 80);
 
     for (let i = 0; i < matrixColumns.length; i++) {
-        // Only draw randomly to keep it sparse like stars/rain
-        if (Math.random() > 0.95) {
+        if (Math.random() > CONFIG.matrixDensity) {
             const char = String.fromCharCode(0x30A0 + Math.random() * 96);
             bgCtx.fillText(char, i * fontSize, matrixColumns[i] * fontSize);
         }
         
-        matrixColumns[i] += Math.random() * speedMult;
+        matrixColumns[i] += Math.random() * speedMult * 0.01;
         
-        if (matrixColumns[i] * fontSize > height && Math.random() > 0.9) {
+        if (matrixColumns[i] * fontSize > height && Math.random() > 0.95) {
             matrixColumns[i] = 0;
         }
     }
@@ -482,8 +646,8 @@ function updatePhysics() {
         let p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
-        p.life -= 0.02;     // Fade out
-        p.vy += 0.1;        // Gravity
+        p.life -= 0.018;
+        p.vy += 0.08;
         
         if (p.life <= 0) {
             particles.splice(i, 1);
@@ -496,11 +660,11 @@ function updatePhysics() {
         }
     }
     
-    // Ripples / Shockwaves
+    // Ripples
     for (let i = ripples.length - 1; i >= 0; i--) {
         let r = ripples[i];
-        r.radius += (r.maxRadius - r.radius) * 0.1; // Ease out
-        r.life -= 0.03;
+        r.radius += (r.maxRadius - r.radius) * 0.08;
+        r.life -= 0.028;
         
         if (r.life <= 0) {
             ripples.splice(i, 1);
@@ -508,18 +672,25 @@ function updatePhysics() {
             ctx.beginPath();
             ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
             ctx.strokeStyle = r.color;
-            ctx.lineWidth = 4 * r.life;
+            ctx.lineWidth = Math.max(2, 3 * r.life);
             ctx.globalAlpha = r.life;
             ctx.stroke();
         }
     }
-    ctx.globalAlpha = 1.0; // Reset
+    ctx.globalAlpha = 1.0;
 }
 
 /**
  * MAIN RENDER PIPELINE
  */
 function renderLoop(timestamp) {
+    // Frame rate limiting
+    const deltaTime = timestamp - lastFrameTime;
+    if (deltaTime < frameInterval) {
+        requestAnimationFrame(renderLoop);
+        return;
+    }
+    lastFrameTime = timestamp;
     requestAnimationFrame(renderLoop);
     
     let dt = (timestamp - lastTime) / 1000;
@@ -536,127 +707,112 @@ function renderLoop(timestamp) {
 
     drawBackground();
 
-    // The main canvas will clear fully each frame since we handle ghosting via bgCanvas 
-    // BUT user requested trailing motion blur for fingertips.
-    // Instead of clearRect, we fade the main canvas using destination-out to keep it transparent
     ctx.globalCompositeOperation = 'destination-out';
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
     ctx.fillRect(0, 0, width, height);
 
-    // Enable Screen mode for additive light effects (like neon bloom)
-    ctx.globalCompositeOperation = 'screen'; // Creates glowy overlapping effects
+    ctx.globalCompositeOperation = 'screen';
 
-    // Render Physics layer
     updatePhysics();
 
-    // Process Hand Logic if present
     if (currentHands.length > 0) {
-        
-        // 1. Draw Skeleton
         currentHands.forEach((hand, handIndex) => {
             const glowColor = themes[currentTheme](time, handIndex, 2);
             
-            // Draw MediaPipe skeleton connectors using custom styles
             drawConnectors(ctx, hand, HAND_CONNECTIONS, {
                 color: glowColor,
-                lineWidth: 2
+                lineWidth: isMobile ? 1.5 : 2
             });
             
-            // Draw Landmarks with neon bloom
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = glowColor;
+            if (CONFIG.maxShadowBlur > 0) {
+                ctx.shadowBlur = CONFIG.maxShadowBlur;
+                ctx.shadowColor = glowColor;
+            }
             
-            // Only draw fingertips with intense bloom and spawn particles
             FINGER_TIPS.forEach((tipIndex, idx) => {
                 const pt = mapToCanvas(hand[tipIndex]);
                 const tipCol = themes[currentTheme](time, idx, FINGER_TIPS.length);
                 
                 ctx.beginPath();
-                ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+                ctx.arc(pt.x, pt.y, isMobile ? 3 : 4, 0, Math.PI * 2);
                 ctx.fillStyle = '#fff';
                 ctx.fill();
 
-                // Generate constant spark particles at fingertips
-                if (Math.random() > 0.6) {
+                if (Math.random() > (1 - CONFIG.particleChance)) {
                     createParticles(pt, tipCol, 1);
                 }
             });
-            ctx.shadowBlur = 0; // Reset
+            ctx.shadowBlur = 0;
         });
 
-        // 2. Cross-Hand Interactions (Lightning & Gradients)
         if (currentHands.length >= 2) {
             const h1 = currentHands[0];
             const h2 = currentHands[1];
 
-            // A. Rainbow Connecting Lines
-            FINGER_TIPS.forEach((tipIndex, idx) => {
-                const pt1 = mapToCanvas(h1[tipIndex]);
-                const pt2 = mapToCanvas(h2[tipIndex]);
-                const dist = getDist(pt1, pt2);
-                
-                const col = themes[currentTheme](time, idx, FINGER_TIPS.length);
-                
-                // Lightning electric arc when very close (but not touching)
-                if (dist < 150 && Math.random() > 0.5) {
-                    // Draw jagged lightning
+            if (CONFIG.enableGradientLines) {
+                FINGER_TIPS.forEach((tipIndex, idx) => {
+                    const pt1 = mapToCanvas(h1[tipIndex]);
+                    const pt2 = mapToCanvas(h2[tipIndex]);
+                    const dist = getDist(pt1, pt2);
+                    
+                    const col = themes[currentTheme](time, idx, FINGER_TIPS.length);
+                    
+                    if (CONFIG.enableLightning && dist < 150 && Math.random() > 0.6) {
+                        ctx.beginPath();
+                        ctx.moveTo(pt1.x, pt1.y);
+                        const midX = (pt1.x + pt2.x) / 2 + (Math.random() - 0.5) * 30;
+                        const midY = (pt1.y + pt2.y) / 2 + (Math.random() - 0.5) * 30;
+                        ctx.lineTo(midX, midY);
+                        ctx.lineTo(pt2.x, pt2.y);
+                        
+                        ctx.strokeStyle = '#ffffff';
+                        if (CONFIG.maxShadowBlur > 0) {
+                            ctx.shadowBlur = 12;
+                            ctx.shadowColor = col;
+                        }
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+
                     ctx.beginPath();
                     ctx.moveTo(pt1.x, pt1.y);
-                    // Midpoint jitter
-                    const midX = (pt1.x + pt2.x)/2 + (Math.random() - 0.5) * 50;
-                    const midY = (pt1.y + pt2.y)/2 + (Math.random() - 0.5) * 50;
-                    ctx.lineTo(midX, midY);
                     ctx.lineTo(pt2.x, pt2.y);
                     
-                    ctx.strokeStyle = '#ffffff';
-                    ctx.shadowBlur = 20;
-                    ctx.shadowColor = col;
+                    let grad = ctx.createLinearGradient(pt1.x, pt1.y, pt2.x, pt2.y);
+                    grad.addColorStop(0, themes[currentTheme](time, idx, 5));
+                    grad.addColorStop(0.5, themes[currentTheme](time, idx + 1, 5));
+                    grad.addColorStop(1, themes[currentTheme](time, idx + 2, 5));
+                    
+                    ctx.strokeStyle = grad;
                     ctx.lineWidth = 3;
+                    if (CONFIG.maxShadowBlur > 0) {
+                        ctx.shadowBlur = 5;
+                        ctx.shadowColor = col;
+                    }
                     ctx.stroke();
-                }
+                    ctx.shadowBlur = 0;
+                });
+            }
 
-                // Normal flowing gradient line
-                ctx.beginPath();
-                ctx.moveTo(pt1.x, pt1.y);
-                ctx.lineTo(pt2.x, pt2.y);
-                
-                // Create gradient that shifts over time
-                let grad = ctx.createLinearGradient(pt1.x, pt1.y, pt2.x, pt2.y);
-                grad.addColorStop(0, themes[currentTheme](time, idx, 5));
-                grad.addColorStop(0.5, themes[currentTheme](time, idx + 1, 5));
-                grad.addColorStop(1, themes[currentTheme](time, idx + 2, 5));
-                
-                ctx.strokeStyle = grad;
-                ctx.lineWidth = 4;
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = col;
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-            });
-
-            // B. Mandala drawing if 10 tips are perfectly detected
-            // (Assuming if we have 2 hands, we draw lines connecting all tips in a star)
-            if (h1 && h2) {
-                // Combine all 10 tips
+            if (h1 && h2 && !CONFIG.isLowEnd) {
                 let allTips = FINGER_TIPS.map(t => mapToCanvas(h1[t])).concat(
                               FINGER_TIPS.map(t => mapToCanvas(h2[t])) );
                 
                 ctx.save();
-                // Find center point to draw Mandala
                 let cx = allTips.reduce((sum, p) => sum + p.x, 0) / 10;
                 let cy = allTips.reduce((sum, p) => sum + p.y, 0) / 10;
                 
                 ctx.translate(cx, cy);
-                ctx.rotate(time * 0.5); // Slow rotation
+                ctx.rotate(time * 0.5);
                 
                 ctx.beginPath();
-                for (let i=0; i<10; i++) {
+                for (let i = 0; i < 10; i++) {
                     const t1 = { x: allTips[i].x - cx, y: allTips[i].y - cy };
-                    const t2 = { x: allTips[(i+3)%10].x - cx, y: allTips[(i+3)%10].y - cy };
+                    const t2 = { x: allTips[(i + 3) % 10].x - cx, y: allTips[(i + 3) % 10].y - cy };
                     ctx.moveTo(t1.x, t1.y);
                     ctx.lineTo(t2.x, t2.y);
                 }
-                ctx.strokeStyle = `rgba(255, 255, 255, 0.2)`;
+                ctx.strokeStyle = `rgba(255, 255, 255, 0.1)`;
                 ctx.lineWidth = 1;
                 ctx.stroke();
                 ctx.restore();
@@ -666,7 +822,7 @@ function renderLoop(timestamp) {
         detectGestures();
     }
     
-    ctx.globalCompositeOperation = 'source-over'; // Restore
+    ctx.globalCompositeOperation = 'source-over';
 }
 
 /**
@@ -679,26 +835,23 @@ function initMediaPipe() {
 
     hands.setOptions({
         maxNumHands: 2,
-        modelComplexity: 1, 
+        modelComplexity: CONFIG.modelComplexity,
         minDetectionConfidence: 0.7,
         minTrackingConfidence: 0.7
     });
 
     hands.onResults((results) => {
-        if (!audioCtx) return; // Wait for initialization
+        if (!audioCtx) return;
 
-        // Update global state for render loop to read from
         uiHands.innerText = results.multiHandLandmarks ? results.multiHandLandmarks.length : 0;
         
-        // Calculate velocity (rudimentary)
         if (currentHands.length > 0 && results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
             let vSum = 0;
-            // check distance difference on index finger of hand 0 
             const oldP = currentHands[0][8];
             const newP = results.multiHandLandmarks[0][8];
             if (oldP && newP) {
                 vSum += getDist(oldP, newP);
-                handVelocities = vSum; 
+                handVelocities = vSum;
             }
         } else {
             handVelocities = 0;
@@ -712,8 +865,8 @@ function initMediaPipe() {
         onFrame: async () => {
             await hands.send({image: videoElement});
         },
-        width: 1280,
-        height: 720,
+        width: CONFIG.cameraWidth,
+        height: CONFIG.cameraHeight,
         facingMode: 'user'
     });
     
